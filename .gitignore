@@ -1,0 +1,4 @@
+/vendor
+/demo/template-out.xlsx
+/tests/coverage
+/tests/phpunit.xml

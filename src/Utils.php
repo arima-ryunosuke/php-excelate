@@ -148,11 +148,10 @@ class Utils
     public static function unmergeCells(Worksheet $sheet, $left, $top, $right, $bottom)
     {
         $count = 0;
-        /** @var string $mergeCell */
         foreach ($sheet->getMergeCells() as $mergeCell) {
             $boundary = Coordinate::rangeBoundaries($mergeCell);
-            list($bLeft, $bTop) = $boundary[0];
-            list($bRight, $bBottom) = $boundary[1];
+            [$bLeft, $bTop] = $boundary[0];
+            [$bRight, $bBottom] = $boundary[1];
             if ($left <= $bLeft && $bRight <= $right && $top <= $bTop && $bBottom <= $bottom) {
                 $sheet->unmergeCells($mergeCell);
                 $count++;
@@ -207,11 +206,10 @@ class Utils
         }
 
         // セル結合の複製
-        /** @var string $mergeCell */
         foreach ($sheet->getMergeCells() as $mergeCell) {
             $boundary = Coordinate::rangeBoundaries($mergeCell);
-            list($bLeft, $bTop) = $boundary[0];
-            list($bRight, $bBottom) = $boundary[1];
+            [$bLeft, $bTop] = $boundary[0];
+            [$bRight, $bBottom] = $boundary[1];
             if ($left <= $bLeft && $bRight <= $right && $top <= $bTop && $bBottom <= $bottom) {
                 $leftIndex = $targetLeft + $bLeft - $left;
                 $topIndex = $targetTop + $bTop - $top;

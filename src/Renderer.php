@@ -193,9 +193,9 @@ class Renderer
             }
         }
 
-        list($lt, $rb) = Coordinate::rangeBoundaries($range);
-        list($left, $top) = $lt;
-        list($right, $bottom) = $rb;
+        [$lt, $rb] = Coordinate::rangeBoundaries($range);
+        [$left, $top] = $lt;
+        [$right, $bottom] = $rb;
 
         return $this->_render($sheet, $vars, $left, $top, $right, $bottom);
     }
@@ -228,7 +228,6 @@ class Renderer
                     switch ($token['type']) {
                         case 'template':
                             throw new \DomainException('{template} tag is permitted only A1 cell.');
-                            break;
                         case 'rowif':
                         case 'colif':
                         case 'if':
@@ -251,7 +250,7 @@ class Renderer
                         case '/if':
                             $varss = $this->placeholder($if['cond'], $vars);
                             if ($varss) {
-                                list($dCol, $dRow) = $this->_render($sheet, $vars, $if['left'], $if['top'], $col, $row);
+                                [$dCol, $dRow] = $this->_render($sheet, $vars, $if['left'], $if['top'], $col, $row);
                                 $right += $dCol;
                                 $bottom += $dRow;
                                 break;
@@ -336,7 +335,7 @@ class Renderer
                                 $t = $foreach['top'] + $rn * $dimRow;
                                 $r = $col + $cn * $dimCol;
                                 $b = $row + $rn * $dimRow;
-                                list($dCol, $dRow) = $this->_render($sheet, $context, $l, $t, $r, $b);
+                                [$dCol, $dRow] = $this->_render($sheet, $context, $l, $t, $r, $b);
 
                                 $rn += $dRow + 1;
                                 $cn += $dCol + 1;

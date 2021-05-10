@@ -54,6 +54,6 @@ class VariableTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     function test___toString()
     {
         $object = new Variable(['hoge' => 'HOGE', 'fuga' => 'FUGA', 'piyo' => 'PIYO']);
-        $this->assertEquals(print_r($object, 1), "$object");
+        $this->assertEquals("$object", print_r($object, 1));
     }
 }

@@ -177,7 +177,6 @@ class Renderer
         $sheet->setTitle($title);
 
         if ($range === null) {
-            $range = 'A1:Z99';
             $cell = $sheet->getCell('A1');
             $cellvalue = $cell->getValue();
             $tokens = $this->parse($cellvalue, $vars);
@@ -191,6 +190,12 @@ class Renderer
                     }
                 }
             }
+        }
+        if ($range === null) {
+            $highests = $sheet->getHighestRowAndColumn();
+            $highests['row']++;
+            $highests['column']++;
+            $range = 'A1:' . $highests['column'] . $highests['row'];
         }
 
         [$lt, $rb] = Coordinate::rangeBoundaries($range);

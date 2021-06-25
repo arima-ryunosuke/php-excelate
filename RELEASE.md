@@ -20,6 +20,11 @@
 
 - パースがメチャクチャなので構文を php に寄せて token_get_all あたりで楽したい
 
+## 1.0.2
+
+- bump version
+  - php: 7.4
+
 ## 1.0.1
 
 - [feature][Renderer] template 範囲を指定しなかったときのデフォルトをデータの範囲に修正

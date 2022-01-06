@@ -1,4 +1,4 @@
 /vendor
 /demo/template-out.xlsx
-/tests/coverage
 /tests/phpunit.xml
+/tests/.phpunit.result.cache

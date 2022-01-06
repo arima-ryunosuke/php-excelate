@@ -10,7 +10,7 @@ abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase
     /** @var Spreadsheet */
     protected static $testBook;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
@@ -19,7 +19,7 @@ abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
 
@@ -39,7 +39,7 @@ abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase
             self::assertInstanceOf(get_class($e), $ex);
             self::assertEquals($e->getCode(), $ex->getCode());
             if (strlen($e->getMessage()) > 0) {
-                self::assertContains($e->getMessage(), $ex->getMessage());
+                self::assertStringContainsString($e->getMessage(), $ex->getMessage());
             }
             return;
         }

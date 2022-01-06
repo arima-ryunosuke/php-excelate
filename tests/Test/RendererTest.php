@@ -134,8 +134,31 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
                 ['title' => 'B', 'children' => [2, 3]],
                 ['title' => 'C', 'children' => [4, 5, 6]],
             ],
+            'dummys3' => [
+                [
+                    'title'    => 'A',
+                    'children' => [
+                        ['hoge' => 'HOGE_A1', 'fuga' => 'FUGA_A1', 'piyo' => 'PIYO_A1'],
+                        ['hoge' => 'HOGE_A2', 'fuga' => 'FUGA_A2', 'piyo' => 'PIYO_A2'],
+                        ['hoge' => 'HOGE_A3', 'fuga' => 'FUGA_A3', 'piyo' => 'PIYO_A3'],
+                    ],
+                ],
+                [
+                    'title'    => 'B',
+                    'children' => [
+                        ['hoge' => 'HOGE_B1', 'fuga' => 'FUGA_B1', 'piyo' => 'PIYO_B1'],
+                        ['hoge' => 'HOGE_B2', 'fuga' => 'FUGA_B2', 'piyo' => 'PIYO_B2'],
+                    ],
+                ],
+                [
+                    'title'    => 'C',
+                    'children' => [
+                        ['hoge' => 'HOGE_C1', 'fuga' => 'FUGA_C1', 'piyo' => 'PIYO_C1'],
+                    ],
+                ],
+            ],
         ]);
-        $this->assertEquals(7, $delta[1]);
+        $this->assertEquals(14, $delta[1]);
 
         $this->assertEquals('0first', $sheet->getCell('B2')->getValue());
         $this->assertEquals('1', $sheet->getCell('B3')->getValue());
@@ -153,6 +176,19 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $this->assertEquals('1', $sheet->getCell('D10')->getValue());
         $this->assertEquals('', $sheet->getCell('B11')->getValue());
         $this->assertEquals('2last', $sheet->getCell('D11')->getValue());
+
+        $this->assertEquals('0first', $sheet->getCell('B13')->getValue());
+        $this->assertEquals('A', $sheet->getCell('C13')->getValue());
+        $this->assertEquals('HOGE_A1', $sheet->getCell('D14')->getValue());
+        $this->assertEquals('PIYO_A3', $sheet->getCell('F16')->getValue());
+        $this->assertEquals('1', $sheet->getCell('B17')->getValue());
+        $this->assertEquals('B', $sheet->getCell('C17')->getValue());
+        $this->assertEquals('HOGE_B1', $sheet->getCell('D18')->getValue());
+        $this->assertEquals('PIYO_B2', $sheet->getCell('F19')->getValue());
+        $this->assertEquals('2last', $sheet->getCell('B20')->getValue());
+        $this->assertEquals('C', $sheet->getCell('C20')->getValue());
+        $this->assertEquals('HOGE_C1', $sheet->getCell('D21')->getValue());
+        $this->assertEquals('PIYO_C1', $sheet->getCell('F21')->getValue());
     }
 
     function test_coleach()

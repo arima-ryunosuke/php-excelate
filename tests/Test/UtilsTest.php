@@ -74,6 +74,24 @@ class UtilsTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $sheet = self::$testBook->getSheetByName('util');
         $delta = Utils::shiftDuplicateRows($sheet, 1, 14, 1, 16, 3);
         $this->assertEquals(9, $delta);
+        ob_start();
+        Utils::echoRangeValues($sheet, "A17:A26");
+        $this->assertEquals(<<<TABLE
+        _____________
+        │___#_│__A__│
+        │  17 │ a   │
+        │  18 │ b   │
+        │  19 │ c   │
+        │  20 │ a   │
+        │  21 │ b   │
+        │  22 │ c   │
+        │  23 │ a   │
+        │  24 │ b   │
+        │  25 │ c   │
+        │  26 │     │
+        ‾‾‾‾‾‾‾‾‾‾‾‾‾
+        
+        TABLE, ob_get_clean());
         $this->assertEquals('a', $sheet->getCell('A17')->getValue());
         $this->assertEquals('b', $sheet->getCell('A18')->getValue());
         $this->assertEquals('c', $sheet->getCell('A19')->getValue());
@@ -104,19 +122,20 @@ class UtilsTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $this->assertEquals(90, $sheet->getCell('AG12')->getFormattedValue());
     }
 
-    function test_dumpCellValues()
+    function test_dumpRangeValues()
     {
         $sheet = self::$testBook->getSheetByName('util');
-        $this->assertEquals([
-            'B2' => 'a',
-            'C2' => 'b',
-            'D2' => 'c',
-            'B3' => 'd',
-            'C3' => 'e',
-            'D3' => 'f',
-            'B4' => 'g',
-            'C4' => 'h',
-            'D4' => 'i',
-        ], Utils::dumpCellValues($sheet, 2, 2, 4, 4));
+        ob_start();
+        Utils::dumpRangeValues($sheet, 'B18:D21');
+        $this->assertEquals(<<<TABLE
+        _____________________________________
+        │___#_│______B_______│__C__│___D____│
+        │  18 │ longlonglong │ s   │ middle │
+        │  19 │ a1           │ b1  │ c1     │
+        │  20 │ a2           │ b2  │ c2     │
+        │  21 │ a3           │ b3  │ c3     │
+        ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+        
+        TABLE, ob_get_clean());
     }
 }

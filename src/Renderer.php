@@ -321,8 +321,8 @@ class Renderer
                                 $dimCol = $col - $foreach['left'] + 1;
                             }
 
-                            $rn = 0;
-                            $cn = 0;
+                            $dc = 0;
+                            $dr = 0;
                             $n = 0;
                             foreach ($varss as $k => $var) {
                                 $section['index'] = $n;
@@ -336,14 +336,14 @@ class Renderer
                                         $foreach['k'] => $k,
                                         $foreach['v'] => $var,
                                     ] + (array) $var + (array) $vars;
-                                $l = $foreach['left'] + $cn * $dimCol;
-                                $t = $foreach['top'] + $rn * $dimRow;
-                                $r = $col + $cn * $dimCol;
-                                $b = $row + $rn * $dimRow;
+                                $l = $foreach['left'] + $dc;
+                                $t = $foreach['top'] + $dr;
+                                $r = $col + $dc;
+                                $b = $row + $dr;
                                 [$dCol, $dRow] = $this->_render($sheet, $context, $l, $t, $r, $b);
 
-                                $rn += $dRow + 1;
-                                $cn += $dCol + 1;
+                                $dc += $dCol + $dimCol;
+                                $dr += $dRow + $dimRow;
                                 $bottom += $dRow;
                                 $right += $dCol;
                                 $n++;

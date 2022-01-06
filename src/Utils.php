@@ -224,13 +224,71 @@ class Utils
 
     public static function dumpCellValues(Worksheet $sheet, $left, $top, $right, $bottom)
     {
-        $values = [];
-        for ($row = $top; $row <= $bottom; $row++) {
-            for ($col = $left; $col <= $right; $col++) {
-                $cell = $sheet->getCellByColumnAndRow($col, $row);
-                $values[$cell->getCoordinate()] = $cell->getValue();
+        $mb_str_pad = function (string $string, int $width, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT): string {
+            $padlength = $width - mb_strwidth($string);
+            if ($padlength <= 0) {
+                return $string;
+            }
+            if ($pad_type === STR_PAD_BOTH) {
+                $padlength = $padlength / 2;
+            }
+
+            if (in_array($pad_type, [STR_PAD_BOTH, STR_PAD_LEFT], true)) {
+                $string = str_repeat($pad_string, floor($padlength)) . $string;
+            }
+            if (in_array($pad_type, [STR_PAD_BOTH, STR_PAD_RIGHT], true)) {
+                $string = $string . str_repeat($pad_string, ceil($padlength));
+            }
+            return $string;
+        };
+
+        $MINCOLUMN = 3;
+        $SIDELINE = '│';
+        $OVERLINE = '‾';
+        $UNDERLINE = '_';
+        $SPACE = ' ';
+
+        $tb = range($top, $bottom);
+        $lr = range($left, $right);
+
+        $values = [-1 => [-1 => '#'] + array_combine($lr, array_map(fn($v) => Coordinate::stringFromColumnIndex($v), $lr))];
+        foreach ($tb as $rowNo) {
+            $values[$rowNo][-1] = $rowNo;
+            foreach ($lr as $colNo) {
+                $values[$rowNo][$colNo] = (string) $sheet->getCellByColumnAndRow($colNo, $rowNo)->getValue();
             }
         }
-        return $values;
+        $widths = [-1 => $MINCOLUMN];
+        foreach ($lr as $colNo) {
+            $widths[$colNo] = max($MINCOLUMN, ...array_map('mb_strwidth', array_column($values, $colNo)));
+        }
+        $styles = [
+            -1  => ['align' => STR_PAD_BOTH, 'delimiter' => $UNDERLINE],
+            '*' => ['align' => STR_PAD_RIGHT, 'delimiter' => $SPACE],
+        ];
+        $lines = [];
+        foreach ($values as $rowNo => $cols) {
+            $style = $styles[$rowNo] ?? $styles['*'];
+            $line = [];
+            foreach ($cols as $colNo => $value) {
+                $line[] = $mb_str_pad($value, $widths[$colNo], $style['delimiter'], $colNo === -1 ? STR_PAD_LEFT : $style['align']);
+            }
+            $lines[] = "$SIDELINE{$style['delimiter']}" . implode("{$style['delimiter']}$SIDELINE{$style['delimiter']}", $line) . "{$style['delimiter']}$SIDELINE";
+        }
+
+        $linesize = mb_strwidth($lines[0]);
+        $V = fn($v) => $v;
+        echo <<<TABLE
+        {$V(str_repeat($UNDERLINE, $linesize))}
+        {$V(implode("\n", $lines))}
+        {$V(str_repeat($OVERLINE, $linesize))}
+        
+        TABLE;
+    }
+
+    public static function dumpRangeValues(Worksheet $sheet, $range)
+    {
+        $boundaries = Coordinate::rangeBoundaries($range);
+        return self::dumpCellValues($sheet, $boundaries[0][0], $boundaries[0][1], $boundaries[1][0], $boundaries[1][1]);
     }
 }

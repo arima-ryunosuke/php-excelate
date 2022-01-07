@@ -241,15 +241,6 @@ class Renderer
                                     'top'  => $row,
                                 ];
                             break;
-                        case 'roweach':
-                        case 'coleach':
-                        case 'rowshift':
-                        case 'colshift':
-                            $foreach = $token['args'] + [
-                                    'left' => $col,
-                                    'top'  => $row,
-                                ];
-                            break;
                         case '/rowif':
                         case '/colif':
                         case '/if':
@@ -288,6 +279,15 @@ class Renderer
                                 }
                             }
                             break;
+                        case 'roweach':
+                        case 'coleach':
+                        case 'rowshift':
+                        case 'colshift':
+                            $foreach = $token['args'] + [
+                                    'left' => $col,
+                                    'top'  => $row,
+                                ];
+                            break;
                         case '/roweach':
                         case '/coleach':
                         case '/rowshift':
@@ -325,17 +325,14 @@ class Renderer
                             $dr = 0;
                             $n = 0;
                             foreach ($varss as $k => $var) {
-                                $section['index'] = $n;
-                                $section['first'] = $n === 0;
-                                $section['last'] = $n === $varslength - 1;
                                 $context = [
-                                        'index' => $n,
-                                        'first' => $n === 0,
-                                        'last'  => $n === $varslength - 1,
-                                    ] + [
-                                        $foreach['k'] => $k,
-                                        $foreach['v'] => $var,
-                                    ] + (array) $var + (array) $vars;
+                                    $foreach['k'] => $k,
+                                    $foreach['v'] => $var,
+                                    'index'       => $n,
+                                    'first'       => $n === 0,
+                                    'last'        => $n === $varslength - 1,
+                                ];
+                                $context += (array) $var + (array) $vars;
                                 $l = $foreach['left'] + $dc;
                                 $t = $foreach['top'] + $dr;
                                 $r = $col + $dc;

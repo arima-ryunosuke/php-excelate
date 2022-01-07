@@ -86,22 +86,12 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
             'string' => 'hello',
         ]);
         $this->assertEquals([0, -3], $delta);
-        $this->assertEquals('1', $sheet->getCell('A2')->getValue());
-        $this->assertEquals('2', $sheet->getCell('B2')->getValue());
-        $this->assertEquals('3', $sheet->getCell('C2')->getValue());
-        $this->assertEquals('4', $sheet->getCell('D2')->getValue());
-        $this->assertEquals('5', $sheet->getCell('E2')->getValue());
 
-        $this->assertEquals('1', $sheet->getCell('A3')->getValue());
-        $this->assertEquals('2', $sheet->getCell('B3')->getValue());
-        $this->assertEquals('3', $sheet->getCell('C3')->getValue());
-        $this->assertEquals('4', $sheet->getCell('D3')->getValue());
-        $this->assertEquals('5', $sheet->getCell('E3')->getValue());
-        $this->assertEquals('-1', $sheet->getCell('A4')->getValue());
-        $this->assertEquals('-2', $sheet->getCell('B4')->getValue());
-        $this->assertEquals('-3', $sheet->getCell('C4')->getValue());
-        $this->assertEquals('-4', $sheet->getCell('D4')->getValue());
-        $this->assertEquals('-5', $sheet->getCell('E4')->getValue());
+        $this->assertRangeValues(<<<EXPECTED
+         1| 2| 3| 4| 5
+         1| 2| 3| 4| 5
+        -1|-2|-3|-4|-5
+        EXPECTED, $sheet, 'A2:E4');
 
         $this->assertEquals('hello', $sheet->getCell('A5')->getValue());
 
@@ -160,35 +150,32 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         ]);
         $this->assertEquals(14, $delta[1]);
 
-        $this->assertEquals('0first', $sheet->getCell('B2')->getValue());
-        $this->assertEquals('1', $sheet->getCell('B3')->getValue());
-        $this->assertEquals('2last', $sheet->getCell('B4')->getValue());
+        $this->assertRangeValues(<<<EXPECTED
+        0first | | HOGE1 | FUGA1 | PIYO1 | |
+        1      | | HOGE2 | FUGA2 | PIYO2 | |
+        2last  | | HOGE3 | FUGA3 | PIYO3 | |
+        EXPECTED, $sheet, 'B2:H4');
 
-        $this->assertEquals('0first', $sheet->getCell('B6')->getValue());
-        $this->assertEquals('0firstlast', $sheet->getCell('D6')->getValue());
-        $this->assertEquals('1', $sheet->getCell('B7')->getValue());
-        $this->assertEquals('0first', $sheet->getCell('D7')->getValue());
-        $this->assertEquals('', $sheet->getCell('B8')->getValue());
-        $this->assertEquals('1last', $sheet->getCell('D8')->getValue());
-        $this->assertEquals('2last', $sheet->getCell('B9')->getValue());
-        $this->assertEquals('0first', $sheet->getCell('D9')->getValue());
-        $this->assertEquals('', $sheet->getCell('B10')->getValue());
-        $this->assertEquals('1', $sheet->getCell('D10')->getValue());
-        $this->assertEquals('', $sheet->getCell('B11')->getValue());
-        $this->assertEquals('2last', $sheet->getCell('D11')->getValue());
+        $this->assertRangeValues(<<<EXPECTED
+        0first | A | 0firstlast | 1 | | A |
+        1      | B | 0first     | 2 | | B |
+               |   | 1last      | 3 | |   |
+        2last  | C | 0first     | 4 | | C |
+               |   | 1          | 5 | |   |
+               |   | 2last      | 6 | |   |
+        EXPECTED, $sheet, 'B6:H11');
 
-        $this->assertEquals('0first', $sheet->getCell('B13')->getValue());
-        $this->assertEquals('A', $sheet->getCell('C13')->getValue());
-        $this->assertEquals('HOGE_A1', $sheet->getCell('D14')->getValue());
-        $this->assertEquals('PIYO_A3', $sheet->getCell('F16')->getValue());
-        $this->assertEquals('1', $sheet->getCell('B17')->getValue());
-        $this->assertEquals('B', $sheet->getCell('C17')->getValue());
-        $this->assertEquals('HOGE_B1', $sheet->getCell('D18')->getValue());
-        $this->assertEquals('PIYO_B2', $sheet->getCell('F19')->getValue());
-        $this->assertEquals('2last', $sheet->getCell('B20')->getValue());
-        $this->assertEquals('C', $sheet->getCell('C20')->getValue());
-        $this->assertEquals('HOGE_C1', $sheet->getCell('D21')->getValue());
-        $this->assertEquals('PIYO_C1', $sheet->getCell('F21')->getValue());
+        $this->assertRangeValues(<<<EXPECTED
+        0first | A |         |         |         | |
+               |   | HOGE_A1 | FUGA_A1 | PIYO_A1 | |
+               |   | HOGE_A2 | FUGA_A2 | PIYO_A2 | |
+               |   | HOGE_A3 | FUGA_A3 | PIYO_A3 | |
+        1      | B |         |         |         | |
+               |   | HOGE_B1 | FUGA_B1 | PIYO_B1 | |
+               |   | HOGE_B2 | FUGA_B2 | PIYO_B2 | |
+        2last  | C |         |         |         | |
+               |   | HOGE_C1 | FUGA_C1 | PIYO_C1 | |
+        EXPECTED, $sheet, 'B13:H21');
     }
 
     function test_coleach()

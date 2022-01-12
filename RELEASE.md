@@ -20,6 +20,12 @@
 
 - パースがメチャクチャなので構文を php に寄せて token_get_all あたりで楽したい
 
+## 1.0.3
+
+- [refactor] 気になる箇所を修正
+- [fixbug][Renderer] roweach がネストしているとき行数によっては動作しない不具合を修正
+- [feature][Utils] デバッグがとても困難なので dumpCellValues をセル範囲を表形式で出力する処理に変更
+
 ## 1.0.2
 
 - bump version

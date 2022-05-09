@@ -200,8 +200,7 @@ class Utils
                 else {
                     $dstCell->setValue($value);
                 }
-                $style = $sheet->getStyleByColumnAndRow($left + $col, $top + $row);
-                $sheet->duplicateStyle($style, $dstCell->getCoordinate());
+                $dstCell->setXfIndex($srcCell->getXfIndex());
             }
         }
 

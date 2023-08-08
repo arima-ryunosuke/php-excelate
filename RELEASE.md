@@ -20,6 +20,12 @@
 
 - パースがメチャクチャなので構文を php に寄せて token_get_all あたりで楽したい
 
+## 1.0.4
+
+- [change] メソッド名の整合性のため既存 render を renderSheet に改名
+- [feature] book ごとレンダリングする renderBook を追加
+- [Utils] copyCells が遅いのを改善
+
 ## 1.0.3
 
 - [refactor] 気になる箇所を修正

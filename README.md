@@ -28,17 +28,29 @@ php /path/to/excelate/demo/run.php
 ![Template](demo/template.png)
 
 ```php
-$book = IOFactory::load(__DIR__ . '/template.xlsx');
-
 $renderer = new Renderer();
-$renderer->render($book->getSheet(0), [
+
+// ブック全体をレンダリング（拡張子に応じて reader/writer が決まり、一時ファイルに書き出される）
+$renderer->renderBook(__DIR__ . '/template.xlsx', [
+    0                  => [
+        'title' => 'example',
+        'rows'  => [
+            ['no' => 1, 'name' => 'hoge', 'attrs' => ['attr1', 'attr2']],
+            ['no' => 2, 'name' => 'fuga', 'attrs' => ['attr1', 'attr2', 'attr3']],
+        ],
+    ],
+    'シート名でもよい' => [],
+]);
+
+// あるいはシートを個別にレンダリング
+$book = IOFactory::load(__DIR__ . '/template.xlsx');
+$renderer->renderSheet($book->getSheet(0), [
     'title' => 'example',
     'rows'  => [
         ['no' => 1, 'name' => 'hoge', 'attrs' => ['attr1', 'attr2']],
         ['no' => 2, 'name' => 'fuga', 'attrs' => ['attr1', 'attr2', 'attr3']],
     ],
 ]);
-
 IOFactory::createWriter($book, 'Xlsx')->save(__DIR__ . '/template-out.xlsx');
 ```
 

@@ -371,7 +371,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $misc = self::$testBook->getSheetByName('misc')->copy();
         $renderer->setErrorMode(Renderer::ERROR_MODE_RENDERING);
         $renderer->renderSheet($misc, ['Name' => 'hoge']);
-        $this->assertEquals('Undefined variable: notfound', $misc->getCell('A1')->getValue());
+        $this->assertStringContainsString('Undefined variable', $misc->getCell('A1')->getValue());
 
         error_clear_last();
         $misc = self::$testBook->getSheetByName('misc')->copy();

@@ -198,7 +198,7 @@ class Renderer
             }
 
             if ($sheet !== null) {
-                $this->render($sheet, $vars);
+                $this->renderSheet($sheet, $vars);
             }
         }
 
@@ -207,6 +207,12 @@ class Renderer
         return $tmpfile;
     }
 
+    public function renderSheet(Worksheet $sheet, $vars, $range = null)
+    {
+        return $this->render($sheet, $vars, $range);
+    }
+
+    /** @deprecated use renderSheet() */
     public function render(Worksheet $sheet, $vars, $range = null)
     {
         $this->currentCell = $sheet->getCell('A1');

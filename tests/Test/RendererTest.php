@@ -47,7 +47,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     {
         $renderer = new Renderer();
         $sheet = self::$testBook->getSheet(2);
-        $renderer->render($sheet, [
+        $renderer->renderSheet($sheet, [
             'value' => 'tValue',
             'st'    => 'hogera',
         ]);
@@ -65,7 +65,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     {
         $renderer = new Renderer();
         $sheet = self::$testBook->getSheetByName('rowif');
-        $delta = $renderer->render($sheet, [
+        $delta = $renderer->renderSheet($sheet, [
             'true'   => true,
             'false'  => false,
             'string' => 'hello',
@@ -88,7 +88,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     {
         $renderer = new Renderer();
         $sheet = self::$testBook->getSheetByName('colif');
-        $delta = $renderer->render($sheet, [
+        $delta = $renderer->renderSheet($sheet, [
             'true'   => true,
             'false'  => false,
             'string' => 'hello',
@@ -111,7 +111,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     {
         $renderer = new Renderer();
         $sheet = self::$testBook->getSheetByName('ifmisc');
-        $delta = $renderer->render($sheet, [
+        $delta = $renderer->renderSheet($sheet, [
             'true'   => true,
             'false'  => false,
             'items'  => [
@@ -148,7 +148,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     {
         $renderer = new Renderer();
         $sheet = self::$testBook->getSheetByName('roweach');
-        $delta = $renderer->render($sheet, [
+        $delta = $renderer->renderSheet($sheet, [
             'dummys1' => [
                 ['hoge' => 'HOGE1', 'fuga' => 'FUGA1', 'piyo' => 'PIYO1'],
                 ['hoge' => 'HOGE2', 'fuga' => 'FUGA2', 'piyo' => 'PIYO2'],
@@ -216,7 +216,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     function test_coleach()
     {
         $renderer = new Renderer();
-        $delta = $renderer->render(self::$testBook->getSheetByName('coleach'), [
+        $delta = $renderer->renderSheet(self::$testBook->getSheetByName('coleach'), [
             'dummys1' => [
                 ['hoge' => 'HOGE1', 'fuga' => 'FUGA1', 'piyo' => 'PIYO1'],
                 ['hoge' => 'HOGE2', 'fuga' => 'FUGA2', 'piyo' => 'PIYO2'],
@@ -234,7 +234,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     function test_rowshift()
     {
         $renderer = new Renderer();
-        $delta = $renderer->render(self::$testBook->getSheetByName('rowshift'), [
+        $delta = $renderer->renderSheet(self::$testBook->getSheetByName('rowshift'), [
             'values' => [
                 'hoge',
                 'fuga',
@@ -247,7 +247,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     function test_colshift()
     {
         $renderer = new Renderer();
-        $delta = $renderer->render(self::$testBook->getSheetByName('colshift'), [
+        $delta = $renderer->renderSheet(self::$testBook->getSheetByName('colshift'), [
             'values' => [
                 'hoge',
                 'fuga',
@@ -261,7 +261,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     {
         $renderer = new Renderer();
         $sheet = self::$testBook->getSheetByName('merge');
-        $renderer->render($sheet, [
+        $renderer->renderSheet($sheet, [
             'empty' => [],
         ]);
         $this->assertCount(4, $sheet->getMergeCells());
@@ -274,7 +274,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
             $cell->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color);
         });
         $sheet = self::$testBook->getSheetByName('effector');
-        $renderer->render($sheet, [
+        $renderer->renderSheet($sheet, [
             'Name'   => 'hoge',
             'Path'   => __DIR__ . '/../test.png',
             'Attrs1' => [
@@ -342,7 +342,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
 
         $this->assertException(new \DomainException(), function () use ($renderer) {
             $misc = self::$testBook->getSheetByName('misc')->copy();
-            $renderer->render($misc, ['notfound' => null], 'C3:C3');
+            $renderer->renderSheet($misc, ['notfound' => null], 'C3:C3');
         });
     }
 
@@ -351,7 +351,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $renderer = new Renderer();
         $renderer->registerVariable('globalValue', 'hogera');
         $misc = self::$testBook->getSheetByName('misc')->copy();
-        $renderer->render($misc, ['notfound' => null], 'A2:A3');
+        $renderer->renderSheet($misc, ['notfound' => null], 'A2:A3');
         $this->assertEquals('{hoge}', $misc->getCell('A2')->getValue());
         $this->assertEquals('hogera', $misc->getCell('A3')->getValue());
     }
@@ -364,19 +364,19 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         error_clear_last();
         $misc = self::$testBook->getSheetByName('misc')->copy();
         $renderer->setErrorMode(Renderer::ERROR_MODE_SILENT);
-        $renderer->render($misc, ['Name' => 'hoge']);
+        $renderer->renderSheet($misc, ['Name' => 'hoge']);
         $this->assertEquals('', $misc->getCell('A1')->getValue());
 
         error_clear_last();
         $misc = self::$testBook->getSheetByName('misc')->copy();
         $renderer->setErrorMode(Renderer::ERROR_MODE_RENDERING);
-        $renderer->render($misc, ['Name' => 'hoge']);
+        $renderer->renderSheet($misc, ['Name' => 'hoge']);
         $this->assertEquals('Undefined variable: notfound', $misc->getCell('A1')->getValue());
 
         error_clear_last();
         $misc = self::$testBook->getSheetByName('misc')->copy();
         $renderer->setErrorMode(Renderer::ERROR_MODE_WARNING);
-        @$renderer->render($misc, ['Name' => 'hoge']);
+        @$renderer->renderSheet($misc, ['Name' => 'hoge']);
         $this->assertEquals('', $misc->getCell('A1')->getValue());
         $this->assertEquals('$notfound', error_get_last()['message']);
 
@@ -384,6 +384,6 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $this->expectException(get_class(new \ErrorException()));
         $misc = self::$testBook->getSheetByName('misc')->copy();
         $renderer->setErrorMode(Renderer::ERROR_MODE_EXCEPTION);
-        $renderer->render($misc, ['Name' => 'hoge']);
+        $renderer->renderSheet($misc, ['Name' => 'hoge']);
     }
 }

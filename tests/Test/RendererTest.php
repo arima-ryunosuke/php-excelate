@@ -3,15 +3,50 @@
 namespace ryunosuke\Test\Excelate;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use ryunosuke\Excelate\Renderer;
 
 class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
 {
+    function test_renderBook()
+    {
+        $renderer = new Renderer();
+        $bookFile = $renderer->renderBook(__DIR__ . '/../test.xlsx', [
+            // @formatter:off
+            'sheet1'          => [
+                'title' => 'X',
+                'A1' => 'x-a1', 'B1' => 'x-b1', 'C1' => 'x-c1',
+                'A2' => 'x-a2', 'B2' => 'x-b2', 'C2' => 'x-c2',
+                'A3' => 'x-a3', 'B3' => 'x-b3', 'C3' => 'x-c3',
+            ],
+            '1'               => [
+                'title' => 'Y',
+                'A1' => 'y-a1', 'B1' => 'y-b1', 'C1' => 'y-c1',
+                'A2' => 'y-a2', 'B2' => 'y-b2', 'C2' => 'y-c2',
+                'A3' => 'y-a3', 'B3' => 'y-b3', 'C3' => 'y-c3',
+            ],
+            'undefined-sheet' => [],
+            // @formatter:on
+        ]);
+
+        $book = IOFactory::load($bookFile);
+        $this->assertRangeValues(<<<EXPECTED
+         x-a1| x-b1| x-c1
+         x-a2| x-b2| x-c2
+         x-a3| x-b3| x-c3
+        EXPECTED, $book->getSheetByName('sheet1'), 'A1:C3');
+        $this->assertRangeValues(<<<EXPECTED
+         y-a1| y-b1| y-c1
+         y-a2| y-b2| y-c2
+         y-a3| y-b3| y-c3
+        EXPECTED, $book->getSheetByName('sheet2Y'), 'A1:C3');
+    }
+
     function test_template()
     {
         $renderer = new Renderer();
-        $sheet = self::$testBook->getSheet(0);
+        $sheet = self::$testBook->getSheet(2);
         $renderer->render($sheet, [
             'value' => 'tValue',
             'st'    => 'hogera',

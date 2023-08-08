@@ -4,6 +4,7 @@ namespace ryunosuke\Excelate;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
@@ -166,6 +167,44 @@ class Renderer
             throw new \InvalidArgumentException("$errorMode is invalid error mode.");
         }
         $this->errorMode = $errorMode;
+    }
+
+    public function renderBook(string $filename, array $sheetsVars)
+    {
+        $typeMap = [
+            'xlsx' => 'Xlsx',
+            'xlsm' => 'Xlsx',
+            'xltx' => 'Xlsx',
+            'xltm' => 'Xlsx',
+            'xls'  => 'Xls',
+            'xlt'  => 'Xls',
+            'ods'  => 'Ods',
+            'htm'  => 'Html',
+            'html' => 'Html',
+            'csv'  => 'Csv',
+        ];
+
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $type = $typeMap[strtolower($extension)];
+
+        $book = IOFactory::createReader($type)->load($filename);
+
+        foreach ($sheetsVars as $eitherNameOrIndex => $vars) {
+            if (is_string($eitherNameOrIndex)) {
+                $sheet = $book->getSheetByName($eitherNameOrIndex);
+            }
+            else {
+                $sheet = $book->getSheet($eitherNameOrIndex);
+            }
+
+            if ($sheet !== null) {
+                $this->render($sheet, $vars);
+            }
+        }
+
+        $tmpfile = tempnam(sys_get_temp_dir(), 'excelate');
+        IOFactory::createWriter($book, $type)->save($tmpfile);
+        return $tmpfile;
     }
 
     public function render(Worksheet $sheet, $vars, $range = null)

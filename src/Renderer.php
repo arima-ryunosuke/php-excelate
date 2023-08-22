@@ -231,7 +231,7 @@ class Renderer
         $this->errorMode = $errorMode;
     }
 
-    public function renderBook(string $filename, array $sheetsVars)
+    public function renderBook(string $filename, array $sheetsVars, callable $done = null)
     {
         $typeMap = [
             'xlsx' => 'Xlsx',
@@ -252,7 +252,10 @@ class Renderer
         $book = IOFactory::createReader($type)->load($filename);
 
         foreach ($sheetsVars as $eitherNameOrIndex => $vars) {
-            if (is_string($eitherNameOrIndex)) {
+            if ($eitherNameOrIndex === "") {
+                $sheet = $book->getActiveSheet();
+            }
+            elseif (is_string($eitherNameOrIndex)) {
                 $sheet = $book->getSheetByName($eitherNameOrIndex);
             }
             else {
@@ -262,6 +265,10 @@ class Renderer
             if ($sheet !== null) {
                 $this->renderSheet($sheet, $vars);
             }
+        }
+
+        if ($done) {
+            $done($book);
         }
 
         $tmpfile = tempnam(sys_get_temp_dir(), 'excelate');

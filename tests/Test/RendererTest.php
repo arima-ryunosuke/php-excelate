@@ -4,6 +4,7 @@ namespace ryunosuke\Test\Excelate;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use ryunosuke\Excelate\Renderer;
 
@@ -11,42 +12,56 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
 {
     function test_renderBook()
     {
+        // このテストがコケた場合は test.xlsx のアクティブシートを active にする
         $renderer = new Renderer();
         $bookFile = $renderer->renderBook(__DIR__ . '/../test.xlsx', [
             // @formatter:off
-            'sheet1'          => [
+            ''                => [
                 'title' => 'X',
                 'A1' => 'x-a1', 'B1' => 'x-b1', 'C1' => 'x-c1',
                 'A2' => 'x-a2', 'B2' => 'x-b2', 'C2' => 'x-c2',
                 'A3' => 'x-a3', 'B3' => 'x-b3', 'C3' => 'x-c3',
             ],
-            '1'               => [
+            'sheet1'          => [
                 'title' => 'Y',
                 'A1' => 'y-a1', 'B1' => 'y-b1', 'C1' => 'y-c1',
                 'A2' => 'y-a2', 'B2' => 'y-b2', 'C2' => 'y-c2',
                 'A3' => 'y-a3', 'B3' => 'y-b3', 'C3' => 'y-c3',
             ],
+            '2'               => [
+                'title' => 'Z',
+                'A1' => 'z-a1', 'B1' => 'z-b1', 'C1' => 'z-c1',
+                'A2' => 'z-a2', 'B2' => 'z-b2', 'C2' => 'z-c2',
+                'A3' => 'z-a3', 'B3' => 'z-b3', 'C3' => 'z-c3',
+            ],
             'undefined-sheet' => [],
             // @formatter:on
-        ]);
+        ], function (Spreadsheet $book){
+            $book->getActiveSheet()->setTitle('active2');
+        });
 
         $book = IOFactory::load($bookFile);
         $this->assertRangeValues(<<<EXPECTED
          x-a1| x-b1| x-c1
          x-a2| x-b2| x-c2
          x-a3| x-b3| x-c3
-        EXPECTED, $book->getSheetByName('sheet1'), 'A1:C3');
+        EXPECTED, $book->getSheetByName('active2'), 'A1:C3');
         $this->assertRangeValues(<<<EXPECTED
          y-a1| y-b1| y-c1
          y-a2| y-b2| y-c2
          y-a3| y-b3| y-c3
-        EXPECTED, $book->getSheetByName('sheet2Y'), 'A1:C3');
+        EXPECTED, $book->getSheetByName('sheet1'), 'A1:C3');
+        $this->assertRangeValues(<<<EXPECTED
+         z-a1| z-b1| z-c1
+         z-a2| z-b2| z-c2
+         z-a3| z-b3| z-c3
+        EXPECTED, $book->getSheetByName('sheet2Z'), 'A1:C3');
     }
 
     function test_template()
     {
         $renderer = new Renderer();
-        $sheet = self::$testBook->getSheet(2);
+        $sheet = self::$testBook->getSheet(3);
         $renderer->renderSheet($sheet, [
             'value' => 'tValue',
             'st'    => 'hogera',

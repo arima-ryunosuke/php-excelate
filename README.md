@@ -32,14 +32,15 @@ $renderer = new Renderer();
 
 // ブック全体をレンダリング（拡張子に応じて reader/writer が決まり、一時ファイルに書き出される）
 $renderer->renderBook(__DIR__ . '/template.xlsx', [
-    0                  => [
+    0       => [ // 基本はシート番号
         'title' => 'example',
         'rows'  => [
             ['no' => 1, 'name' => 'hoge', 'attrs' => ['attr1', 'attr2']],
             ['no' => 2, 'name' => 'fuga', 'attrs' => ['attr1', 'attr2', 'attr3']],
         ],
     ],
-    'シート名でもよい' => [],
+    'sheet' => [], // シート名でもよい
+    ''      => [], // 空文字はアクティブシートを意味する
 ]);
 
 // あるいはシートを個別にレンダリング
@@ -187,6 +188,7 @@ rowshift の列バージョンです。
 このセルは http://example.com が貼られます{$HyperLink('http://example.com', 'link text')}
 このセルは文字色が赤になります{$Color('FF0000')}
 このセルは罫線がつきます{$Border([['medium','FF0000']])}
+このセルはリスト入力規則になります{$ValidationList(['選択肢A', '選択肢B', '選択肢C'])}
 このセルを基準にして画像が埋め込まれます{$Image('path/to/image.png')}
 このセルを基準にして画像が埋め込まれます{$Image(['path' => 'path/to/image.png', 'width' => 100, 'description' => '配列で属性が指定できます'])}
 ```

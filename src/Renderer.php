@@ -4,6 +4,7 @@ namespace ryunosuke\Excelate;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
@@ -79,6 +80,67 @@ class Renderer
                     $b->getColor()->setRGB($border[$n][1]);
                 }
             }
+        });
+        // 入力規則 effector @see https://phpspreadsheet.readthedocs.io/en/latest/topics/recipes/#setting-data-validation-on-a-cell
+        $validation = function (Cell $cell, $attrs) {
+            // array_change_key_case が遅いわけではないが超頻繁に呼ばれる可能性があるので無駄なことはしない
+            if (!isset($attrs['__from__'])) {
+                $attrs = array_change_key_case($attrs);
+            }
+            unset($attrs['__from__']);
+
+            // メッセージ系の簡易設定（指定されていたら自動で true にしたり）
+            $types = [
+                'prompt' => ['switch' => 'showinputmessage', 'message' => 'prompt', 'title' => 'prompttitle', 'style' => null],
+                'error'  => ['switch' => 'showerrormessage', 'message' => 'error', 'title' => 'errortitle', 'style' => DataValidation::STYLE_STOP],
+                'warn'   => ['switch' => 'showerrormessage', 'message' => 'error', 'title' => 'errortitle', 'style' => DataValidation::STYLE_WARNING],
+                'info'   => ['switch' => 'showerrormessage', 'message' => 'error', 'title' => 'errortitle', 'style' => DataValidation::STYLE_INFORMATION],
+            ];
+            foreach ($types as $type => $config) {
+                if (isset($attrs[$type])) {
+                    $messages = ((array) $attrs[$type]) + [1 => ''];
+                    $attrs[$config['switch']] = true;
+                    $attrs[$config['message']] = $messages[0];
+                    $attrs[$config['title']] = $messages[1];
+                    if ($config['style']) {
+                        $attrs['errorstyle'] = $config['style'];
+                    }
+                    unset($attrs[$type]);
+                }
+            }
+
+            // デフォルト系（未設定のみ）
+            $attrs['showerrormessage'] ??= true; // エラーを出さないと入力規則の旨味がほとんどない
+            if ($attrs['type'] === DataValidation::TYPE_LIST) {
+                $attrs['showdropdown'] ??= true; // ドロップダウンを出さないリストはほとんどない
+            }
+
+            $validation = $cell->getDataValidation();
+            foreach ($attrs as $name => $value) {
+                $validation->{"set$name"}(...(array) $value);
+            }
+        };
+        $this->registerEffector('Validation', $validation); // 汎用
+        $this->registerEffector('ValidationList', function (Cell $cell, $attrs) use ($validation) { // 経験上、最も多い入力規則はリスト型
+            // デフォルト設定で良ければ単にリストを与えた場合に選択肢とする
+            $indexarray = true;
+            foreach ($attrs as $name => $dummy) {
+                if (is_string($name)) {
+                    $indexarray = false;
+                    break;
+                }
+            }
+            if ($indexarray) {
+                $attrs = ['formula1' => $attrs];
+            }
+
+            $attrs = array_change_key_case($attrs);
+            $attrs['__from__'] = DataValidation::TYPE_LIST;
+            $attrs['type'] = DataValidation::TYPE_LIST;
+            if (is_array($attrs['formula1'])) {
+                $attrs['formula1'] = '"' . implode(',', array_map(fn($v) => strtr($v, ['"' => '""']), $attrs['formula1'])) . '"';
+            }
+            return $validation($cell, $attrs);
         });
         // 画像を埋め込む effector
         $this->registerEffector('Image', function (Cell $cell, $attrs) {

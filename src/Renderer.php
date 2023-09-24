@@ -347,6 +347,12 @@ class Renderer
                     switch ($token['type']) {
                         case 'template':
                             throw new \DomainException('{template} tag is permitted only A1 cell.');
+                        case 'row':
+                            $varss = $this->placeholder($token['args']['values'], $vars);
+                            foreach (array_values($varss) as $dc => $value) {
+                                $sheet->getCellByColumnAndRow($col + $dc, $row)->setValue($value)->setXfIndex($cell->getXfIndex());
+                            }
+                            break;
                         case 'rowcol':
                             $varss = $this->placeholder($token['args']['values'], $vars);
                             if ($varss) {
@@ -508,6 +514,19 @@ class Renderer
                             'range' => $matches[2],
                         ],
                     ];
+                }
+                elseif (preg_match('#^(row)\s+([^:}]+)$#', $_token, $matches)) {
+                    if ($nest === 0) {
+                        $tokens[] = [
+                            'type' => $matches[1],
+                            'args' => [
+                                'values' => trim($matches[2]),
+                            ],
+                        ];
+                    }
+                    else {
+                        $cellvalue .= $token;
+                    }
                 }
                 elseif (preg_match('#^(rowcol)\s+([^:}]+):?(true|false)?$#', $_token, $matches)) {
                     if ($nest === 0) {

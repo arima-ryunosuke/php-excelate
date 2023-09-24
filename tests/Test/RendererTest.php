@@ -76,6 +76,24 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $this->assertEquals('{$value}', $sheet->getCell('A3')->getValue());
     }
 
+    function test_row()
+    {
+        $renderer = new Renderer();
+        $sheet = self::$testBook->getSheetByName('row');
+        $delta = $renderer->renderSheet($sheet, [
+            'row1' => ['col1A', 'col1B', 'col1C'],
+            'row2' => ['col2A', 'col2B', 'col2C'],
+            'row3' => [],
+        ]);
+        $this->assertEquals([0, 0], $delta);
+        $this->assertRangeValues(<<<EXPECTED
+        col1A | col1B | col1C |       | 
+              | col2A | col2B | col2C | 
+              |       | az    |       | 
+        fixed |       |       |       | 
+        EXPECTED, $sheet, 'A2:E5');
+    }
+
     function test_rowcol()
     {
         $renderer = new Renderer();

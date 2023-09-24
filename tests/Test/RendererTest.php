@@ -36,7 +36,7 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
             ],
             'undefined-sheet' => [],
             // @formatter:on
-        ], function (Spreadsheet $book){
+        ], function (Spreadsheet $book) {
             $book->getActiveSheet()->setTitle('active2');
         });
 
@@ -74,6 +74,37 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         // 範囲外はレンダリングされていないはず
         $this->assertEquals('{$value}', $sheet->getCell('C1')->getValue());
         $this->assertEquals('{$value}', $sheet->getCell('A3')->getValue());
+    }
+
+    function test_rowcol()
+    {
+        $renderer = new Renderer();
+        $sheet = self::$testBook->getSheetByName('rowcol');
+        $delta = $renderer->renderSheet($sheet, [
+            'csv1' => [
+                ['col1A' => 'val1A1', 'col1B' => 'val1B1', 'col1C' => 'val1C1'],
+                ['col1A' => 'val1A2', 'col1B' => 'val1B2', 'col1C' => 'val1C2'],
+                ['col1A' => 'val1A3', 'col1B' => 'val1B3', 'col1C' => 'val1C3'],
+            ],
+            'csv2' => [
+                ['col2A' => 'val2A1', 'col2B' => 'val2B1', 'col2C' => 'val2C1'],
+                ['col2A' => 'val2A2', 'col2B' => 'val2B2', 'col2C' => 'val2C2'],
+                ['col2A' => 'val2A3', 'col2B' => 'val2B3', 'col2C' => 'val2C3'],
+            ],
+            'csv3' => [],
+        ]);
+        $this->assertEquals([0, 7], $delta);
+        $this->assertRangeValues(<<<EXPECTED
+        val1A1 | val1B1 | val1C1 |        | 
+        val1A2 | val1B2 | val1C2 |        | 
+        val1A3 | val1B3 | val1C3 |        | 
+               | col2A  | col2B  | col2C  | 
+               | val2A1 | val2B1 | val2C1 | 
+               | val2A2 | val2B2 | val2C2 | 
+               | val2A3 | val2B3 | val2C3 | 
+               |        | az     |        | 
+         fixed |        |        |        | 
+        EXPECTED, $sheet, 'A2:E10');
     }
 
     function test_rowif()

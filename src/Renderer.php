@@ -347,6 +347,28 @@ class Renderer
                     switch ($token['type']) {
                         case 'template':
                             throw new \DomainException('{template} tag is permitted only A1 cell.');
+                        case 'rowcol':
+                            $varss = $this->placeholder($token['args']['values'], $vars);
+                            if ($varss) {
+                                if ($token['args']['header']) {
+                                    $varss = array_merge([array_keys(reset($varss))], $varss);
+                                }
+
+                                $varslength = count($varss);
+
+                                if ($varslength > 1) {
+                                    $sheet->insertNewRowBefore($row + 1, $varslength - 1);
+                                }
+
+                                foreach (array_values($varss) as $dr => $cols) {
+                                    foreach (array_values($cols) as $dc => $value) {
+                                        $sheet->getCellByColumnAndRow($col + $dc, $row + $dr)->setValue($value);
+                                    }
+                                }
+
+                                $bottom += $varslength;
+                            }
+                            break;
                         case 'rowif':
                         case 'colif':
                         case 'if':
@@ -486,6 +508,20 @@ class Renderer
                             'range' => $matches[2],
                         ],
                     ];
+                }
+                elseif (preg_match('#^(rowcol)\s+([^:}]+):?(true|false)?$#', $_token, $matches)) {
+                    if ($nest === 0) {
+                        $tokens[] = [
+                            'type' => $matches[1],
+                            'args' => [
+                                'values' => trim($matches[2]),
+                                'header' => filter_var(trim($matches[3] ?? false), FILTER_VALIDATE_BOOLEAN),
+                            ],
+                        ];
+                    }
+                    else {
+                        $cellvalue .= $token;
+                    }
                 }
                 elseif (preg_match('#^(rowif|colif|if)\s+([^}]+)$#', $_token, $matches)) {
                     if ($nest++ === 0) {

@@ -20,6 +20,14 @@
 
 - パースがメチャクチャなので構文を php に寄せて token_get_all あたりで楽したい
 
+## 1.1.0
+
+- [*change] 互換のために残していた render メソッドを削除
+- [*change] Variable を削除
+- [composer] phpspreadsheet:1,2,3
+- [composer] phpunit9
+- [change] php8.2 のエラーを修正
+
 ## 1.0.7
 
 - [feature] row 構文を追加

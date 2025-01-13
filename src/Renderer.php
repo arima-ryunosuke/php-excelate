@@ -335,7 +335,7 @@ class Renderer
 
         for ($row = $top; $row <= $bottom; $row++) {
             for ($col = $left; $col <= $right; $col++) {
-                $cell = $sheet->getCellByColumnAndRow($col, $row);
+                $cell = $sheet->getCell([$col, $row]);
                 $cellvalue = $cellvalue2 = $cell->getValue();
                 $this->currentCell = $cell;
                 $tokens = $this->parse($cellvalue, $vars, $nest);
@@ -350,7 +350,7 @@ class Renderer
                         case 'row':
                             $varss = $this->placeholder($token['args']['values'], $vars);
                             foreach (array_values($varss) as $dc => $value) {
-                                $sheet->getCellByColumnAndRow($col + $dc, $row)->setValue($value)->setXfIndex($cell->getXfIndex());
+                                $sheet->getCell([$col + $dc, $row])->setValue($value)->setXfIndex($cell->getXfIndex());
                             }
                             break;
                         case 'rowcol':
@@ -368,7 +368,7 @@ class Renderer
 
                                 foreach (array_values($varss) as $dr => $cols) {
                                     foreach (array_values($cols) as $dc => $value) {
-                                        $sheet->getCellByColumnAndRow($col + $dc, $row + $dr)->setValue($value);
+                                        $sheet->getCell([$col + $dc, $row + $dr])->setValue($value);
                                     }
                                 }
 

@@ -66,7 +66,7 @@ abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase
         foreach (range($boundaries[0][1], $boundaries[1][1]) as $y) {
             $line = [];
             foreach (range($boundaries[0][0], $boundaries[1][0]) as $x) {
-                $cell = $sheet->getCellByColumnAndRow($x, $y);
+                $cell = $sheet->getCell([$x, $y]);
                 $line[] = trim((string) ($formattedValue ? $cell->getFormattedValue() : $cell->getValue()));
             }
             $actual[] = $line;

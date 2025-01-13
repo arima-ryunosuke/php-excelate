@@ -189,8 +189,8 @@ class Utils
         $helper = ReferenceHelper::getInstance();
         foreach ($cols as $col) {
             foreach ($rows as $row) {
-                $srcCell = $sheet->getCellByColumnAndRow($left + $col, $top + $row);
-                $dstCell = $sheet->getCellByColumnAndRow($targetLeft + $col, $targetTop + $row);
+                $srcCell = $sheet->getCell([$left + $col, $top + $row]);
+                $dstCell = $sheet->getCell([$targetLeft + $col, $targetTop + $row]);
 
                 $value = $srcCell->getValue();
                 if ($srcCell->isFormula()) {
@@ -254,7 +254,7 @@ class Utils
         foreach ($tb as $rowNo) {
             $values[$rowNo][-1] = $rowNo;
             foreach ($lr as $colNo) {
-                $values[$rowNo][$colNo] = (string) $sheet->getCellByColumnAndRow($colNo, $rowNo)->getValue();
+                $values[$rowNo][$colNo] = (string) $sheet->getCell([$colNo, $rowNo])->getValue();
             }
         }
         $widths = [-1 => $MINCOLUMN];

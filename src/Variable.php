@@ -5,6 +5,7 @@ namespace ryunosuke\Excelate;
 /**
  * 配列のようにもオブジェクトのようにもアクセスできるクラス
  */
+#[\AllowDynamicProperties]
 class Variable implements \ArrayAccess, \Countable
 {
     /**
@@ -37,32 +38,33 @@ class Variable implements \ArrayAccess, \Countable
         }
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->$offset);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->$offset;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->$offset = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->$offset);
     }
 
-    public function count()
+    public function count(): int
     {
         return count((array) $this);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) print_r($this, 1);
     }

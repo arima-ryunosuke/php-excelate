@@ -498,7 +498,7 @@ class Renderer
 
     private function parse(&$cellvalue, $vars, &$nest = 0)
     {
-        if (strlen($cellvalue) === 0) {
+        if (strlen($cellvalue ?? '') === 0) {
             return [];
         }
         $tokens = [];

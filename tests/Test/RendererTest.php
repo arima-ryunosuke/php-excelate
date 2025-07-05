@@ -306,27 +306,60 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
     function test_rowshift()
     {
         $renderer = new Renderer();
-        $delta = $renderer->renderSheet(self::$testBook->getSheetByName('rowshift'), [
+        $sheet = self::$testBook->getSheetByName('rowshift');
+        $delta = $renderer->renderSheet($sheet, [
             'values' => [
                 'hoge',
                 'fuga',
                 'piyo',
             ],
+            'empty'   => [],
         ]);
-        $this->assertEquals(6, $delta[1]);
+        $this->assertEquals(5, $delta[1]);
+
+        $this->assertRangeValues(<<<EXPECTED
+         
+        hoge
+        
+        
+        fuga
+        
+        
+        piyo
+        
+        m
+        EXPECTED, $sheet, 'D1:D10');
+
+        $this->assertRangeValues(<<<EXPECTED
+             | top    | 
+        left | bottom | right
+             |        | 
+        EXPECTED, $sheet, 'A6:C8');
     }
 
     function test_colshift()
     {
         $renderer = new Renderer();
-        $delta = $renderer->renderSheet(self::$testBook->getSheetByName('colshift'), [
+        $sheet = self::$testBook->getSheetByName('colshift');
+        $delta = $renderer->renderSheet($sheet, [
             'values' => [
                 'hoge',
                 'fuga',
                 'piyo',
             ],
+            'empty'   => [],
         ]);
-        $this->assertEquals(6, $delta[0]);
+        $this->assertEquals(5, $delta[0]);
+
+        $this->assertRangeValues(<<<EXPECTED
+         | hoge |  |  | fuga |  |  | piyo |  | m
+        EXPECTED, $sheet, 'B2:K2');
+
+        $this->assertRangeValues(<<<EXPECTED
+             | top    | 
+        left | right  | 
+             | bottom | 
+        EXPECTED, $sheet, 'B5:D7');
     }
 
     function test_merge()

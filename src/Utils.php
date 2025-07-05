@@ -111,6 +111,7 @@ class Utils
 
         if ($size < 0) {
             self::unmergeCells($sheet, $left, $top, $right, $bottom);
+            self::copyCells($sheet, $left, $bottom + 1, $right, $bottomLimit, null, $top, 'move');
         }
         else {
             for ($n = 0; $n < $length; $n++) {
@@ -148,6 +149,7 @@ class Utils
 
         if ($size < 0) {
             self::unmergeCells($sheet, $left, $top, $right, $bottom);
+            self::copyCells($sheet, $right + 1, $top, $rightLimit, $bottom, $left, null, 'move');
         }
         else {
             for ($n = 0; $n < $length; $n++) {
@@ -193,8 +195,9 @@ class Utils
      * @param int $bottom
      * @param int $targetLeft
      * @param int $targetTop
+     * @param string $mergedCellMethod
      */
-    public static function copyCells(Worksheet $sheet, $left, $top, $right, $bottom, $targetLeft = null, $targetTop = null)
+    public static function copyCells(Worksheet $sheet, $left, $top, $right, $bottom, $targetLeft = null, $targetTop = null, $mergedCellMethod = 'copy')
     {
         // 指定されなければ同列・同行とする
         $targetLeft = $targetLeft ?? $left;
@@ -227,7 +230,7 @@ class Utils
             }
         }
 
-        // セル結合の複製
+        // セル結合の移動・複製
         foreach ($sheet->getMergeCells() as $mergeCell) {
             $boundary = Coordinate::rangeBoundaries($mergeCell);
             [$bLeft, $bTop] = $boundary[0];
@@ -240,6 +243,9 @@ class Utils
                 $leftTop = Coordinate::stringFromColumnIndex($leftIndex) . $topIndex;
                 $rightBottom = Coordinate::stringFromColumnIndex($leftIndex + $bWidth) . ($topIndex + $bHeight);
                 $sheet->mergeCells("$leftTop:$rightBottom");
+                if ($mergedCellMethod === 'move') {
+                    $sheet->unmergeCells($mergeCell);
+                }
             }
         }
     }

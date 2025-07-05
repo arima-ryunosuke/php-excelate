@@ -27,6 +27,12 @@ class UtilsTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $sheet = self::$testBook->getSheetByName('util');
         $delta = Utils::insertDuplicateRows($sheet, 1, 7, 6, 7, 39, 2);
         $this->assertEquals(2, $delta);
+        $this->assertContains('B39:D39', $sheet->getMergeCells());
+        $this->assertContains('B40:D40', $sheet->getMergeCells());
+
+        $delta = Utils::insertDuplicateRows($sheet, 1, 40, 3, 40, 40, -1);
+        $this->assertEquals(-1, $delta);
+        $this->assertNotContains('B40:D40', $sheet->getMergeCells());
     }
 
     function test_insertDuplicateCols()
@@ -50,6 +56,11 @@ class UtilsTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $sheet = self::$testBook->getSheetByName('util');
         $delta = Utils::insertDuplicateCols($sheet, 1, 7, 6, 7, 39, 1);
         $this->assertEquals(6, $delta);
+        $this->assertContains('AN7:AP7', $sheet->getMergeCells());
+
+        $delta = Utils::insertDuplicateCols($sheet, 40, 7, 42, 7, 40, -3);
+        $this->assertEquals(-9, $delta);
+        $this->assertNotContains('AN7:AP7', $sheet->getMergeCells());
     }
 
     function test_shiftDuplicateRows()

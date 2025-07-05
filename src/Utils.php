@@ -98,18 +98,27 @@ class Utils
      */
     public static function shiftDuplicateRows(Worksheet $sheet, $left, $top, $right, $bottom, $length, $bottomLimit = null)
     {
+        $height = $bottom - $top + 1;
+        $size = $height * $length;
+
+        if ($size === 0) {
+            return 0;
+        }
+
         if ($bottomLimit === null) {
             $bottomLimit = $sheet->getHighestRow();
         }
 
-        if ($length < 0) {
+        if ($size < 0) {
             self::unmergeCells($sheet, $left, $top, $right, $bottom);
         }
-        for ($i = 0; $i < $length; $i++) {
-            self::copyCells($sheet, $left, $top, $right, $bottomLimit, null, $bottom + 1);
+        else {
+            for ($n = 0; $n < $length; $n++) {
+                self::copyCells($sheet, $left, $top, $right, $bottomLimit + $n * $height, null, $bottom + 1);
+            }
         }
 
-        return ($bottom - $top + 1) * $length;
+        return $size;
     }
 
     /**
@@ -126,17 +135,27 @@ class Utils
      */
     public static function shiftDuplicateCols(Worksheet $sheet, $left, $top, $right, $bottom, $length, $rightLimit = null)
     {
+        $width = $right - $left + 1;
+        $size = $width * $length;
+
+        if ($size === 0) {
+            return 0;
+        }
+
         if ($rightLimit === null) {
             $rightLimit = Coordinate::columnIndexFromString($sheet->getHighestColumn());
         }
-        if ($length < 0) {
+
+        if ($size < 0) {
             self::unmergeCells($sheet, $left, $top, $right, $bottom);
         }
-        for ($i = 0; $i < $length; $i++) {
-            self::copyCells($sheet, $left, $top, $rightLimit, $bottom, $right + 1, null);
+        else {
+            for ($n = 0; $n < $length; $n++) {
+                self::copyCells($sheet, $left, $top, $rightLimit + $n * $width, $bottom, $right + 1, null);
+            }
         }
 
-        return ($right - $left + 1) * $length;
+        return $size;
     }
 
     /**

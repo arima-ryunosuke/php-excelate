@@ -52,16 +52,6 @@ class UtilsTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $this->assertEquals(6, $delta);
     }
 
-    function test_shiftDuplicateCols()
-    {
-        $sheet = self::$testBook->getSheetByName('util');
-        $delta = Utils::shiftDuplicateCols($sheet, 1, 14, 3, 14, 3);
-        $this->assertEquals(9, $delta);
-        $this->assertRangeValues(<<<EXPECTED
-        a|b|c|a|b|c|a|b|c|
-        EXPECTED, $sheet, 'D14:M14');
-    }
-
     function test_shiftDuplicateRows()
     {
         $sheet = self::$testBook->getSheetByName('util');
@@ -79,6 +69,30 @@ class UtilsTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         c
         
         EXPECTED, $sheet, 'A17:A26');
+    }
+
+    function test_shiftDuplicateRows_0()
+    {
+        $sheet = self::$testBook->getSheetByName('util');
+        $delta = Utils::shiftDuplicateRows($sheet, 1, 14, 1, 16, 0);
+        $this->assertEquals(0, $delta);
+    }
+
+    function test_shiftDuplicateCols()
+    {
+        $sheet = self::$testBook->getSheetByName('util');
+        $delta = Utils::shiftDuplicateCols($sheet, 1, 14, 3, 14, 3);
+        $this->assertEquals(9, $delta);
+        $this->assertRangeValues(<<<EXPECTED
+        a|b|c|a|b|c|a|b|c|
+        EXPECTED, $sheet, 'D14:M14');
+    }
+
+    function test_shiftDuplicateCols_0()
+    {
+        $sheet = self::$testBook->getSheetByName('util');
+        $delta = Utils::shiftDuplicateCols($sheet, 1, 14, 3, 14, 0);
+        $this->assertEquals(0, $delta);
     }
 
     function test_copyCells()

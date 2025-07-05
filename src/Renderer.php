@@ -345,9 +345,28 @@ class Renderer
                             }
                             break;
                         case 'row':
+                        case 'col':
+                            $rowmode = $token['type'] === 'row';
                             $varss = $this->placeholder($token['args']['values'], $vars);
-                            foreach (array_values($varss) as $dc => $value) {
-                                $sheet->getCell([$col + $dc, $row])->setValue($value)->setXfIndex($cell->getXfIndex());
+                            $varslength = count($varss);
+                            $index = 0;
+                            foreach ($varss as $key => $value) {
+                                $x = $col + ($rowmode ? $index : 0);
+                                $y = $row + ($rowmode ? 0 : $index);
+
+                                if (isset($token['args']['format'])) {
+                                    $value = $this->placeholder($token['args']['format'], [
+                                        'k'     => $key,
+                                        'v'     => $value,
+                                        'index' => $index,
+                                        'first' => $index === 0,
+                                        'last'  => $index === $varslength - 1,
+                                    ]);
+                                }
+
+                                $sheet->getCell([$x, $y])->setValue($value)->setXfIndex($cell->getXfIndex());
+
+                                $index++;
                             }
                             break;
                         case 'rowcol':
@@ -512,12 +531,13 @@ class Renderer
                         ],
                     ];
                 }
-                elseif (preg_match('#^(row)\s+([^:}]+)$#', $_token, $matches)) {
+                elseif (preg_match('#^(row|col)\s+([^:}]+)(\s*=>\s*(.+))?$#', $_token, $matches)) {
                     if ($nest === 0) {
                         $tokens[] = [
                             'type' => $matches[1],
                             'args' => [
                                 'values' => trim($matches[2]),
+                                'format' => $matches[4] ?? null,
                             ],
                         ];
                     }

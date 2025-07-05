@@ -87,11 +87,29 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         ]);
         $this->assertEquals([0, 0], $delta);
         $this->assertRangeValues(<<<EXPECTED
-        col1A | col1B | col1C |       | 
-              | col2A | col2B | col2C | 
-              |       | az    |       | 
-        fixed |       |       |       | 
+        0-1- 0:col1A | 1-- 1:col1B | 2--1 2:col1C |       | 
+                     | col2A       | col2B        | col2C | 
+                     |             | az           |       | 
+        fixed        |             |              |       | 
         EXPECTED, $sheet, 'A2:E5');
+    }
+
+    function test_col()
+    {
+        $renderer = new Renderer();
+        $sheet = self::$testBook->getSheetByName('col');
+        $delta = $renderer->renderSheet($sheet, [
+            'col1' => ['col1A', 'col1B', 'col1C'],
+            'col2' => ['col2A', 'col2B', 'col2C'],
+            'col3' => [],
+        ]);
+        $this->assertEquals([0, 0], $delta);
+        $this->assertRangeValues(<<<EXPECTED
+        0-1- 0:col1A  |       | 
+        1-- 1:col1B   | col2A | 
+        2--1 2:col1C  | col2B | az
+        fixed         | col2C | 
+        EXPECTED, $sheet, 'A2:C5');
     }
 
     function test_rowcol()

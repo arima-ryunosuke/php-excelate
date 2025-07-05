@@ -246,8 +246,9 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
                     ],
                 ],
             ],
+            'empty'   => [],
         ]);
-        $this->assertEquals(14, $delta[1]);
+        $this->assertEquals(12, $delta[1]);
 
         $this->assertRangeValues(<<<EXPECTED
         0first | | HOGE1 | FUGA1 | PIYO1 | |
@@ -275,6 +276,13 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         2last  | C |         |         |         | |
                |   | HOGE_C1 | FUGA_C1 | PIYO_C1 | |
         EXPECTED, $sheet, 'B13:H21');
+
+        $this->assertRangeValues(<<<EXPECTED
+        |        |  |  |  |  |  |  |
+        | top    |  |  |  |  |  |  |
+        | bottom |  |  |  |  |  |  |
+        |        |  |  |  |  |  |  |
+        EXPECTED, $sheet, 'A23:I26');
     }
 
     function test_coleach()

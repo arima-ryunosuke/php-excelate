@@ -34,13 +34,15 @@ class Utils
         }
 
         if ($size < 0) {
+            $asize = -$size;
             self::unmergeCells($sheet, $left, $top, $right, $bottom);
+            $sheet->removeRow($targetRow - $asize, $asize);
         }
-
-        $sheet->insertNewRowBefore($targetRow, $size);
-
-        for ($n = 0; $n < $length; $n++) {
-            self::copyCells($sheet, $left, $top, $right, $bottom, null, $targetRow + $n * $height);
+        else {
+            $sheet->insertNewRowBefore($targetRow, $size);
+            for ($n = 0; $n < $length; $n++) {
+                self::copyCells($sheet, $left, $top, $right, $bottom, null, $targetRow + $n * $height);
+            }
         }
 
         return $size;
@@ -68,13 +70,15 @@ class Utils
         }
 
         if ($size < 0) {
+            $asize = -$size;
             self::unmergeCells($sheet, $left, $top, $right, $bottom);
+            $sheet->removeColumn(Coordinate::stringFromColumnIndex($targetCol - $asize), $asize);
         }
-
-        $sheet->insertNewColumnBefore(Coordinate::stringFromColumnIndex($targetCol), $size);
-
-        for ($n = 0; $n < $length; $n++) {
-            self::copyCells($sheet, $left, $top, $right, $bottom, $targetCol + $n * $width, null);
+        else {
+            $sheet->insertNewColumnBefore(Coordinate::stringFromColumnIndex($targetCol), $size);
+            for ($n = 0; $n < $length; $n++) {
+                self::copyCells($sheet, $left, $top, $right, $bottom, $targetCol + $n * $width, null);
+            }
         }
 
         return $size;

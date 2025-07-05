@@ -6,10 +6,13 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\IReader;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 
 /**
  * 埋め込みテンプレートをレンダリングするクラス
@@ -231,8 +234,23 @@ class Renderer
         $this->errorMode = $errorMode;
     }
 
-    public function renderBook(string $filename, array $sheetsVars, callable $done = null)
+    public function renderBook(string $filename, array $sheetsVars, $callbacks = [])
     {
+        // for compatible
+        if (is_callable($callbacks)) {
+            $callbacks = [
+                'after' => $callbacks,
+            ];
+        }
+
+        // デフォルト兼インターフェースの明示
+        $callbacks += [
+            'reader' => fn(IReader $reader) => $reader,
+            'before' => fn(Spreadsheet $book) => $book,
+            'after'  => fn(Spreadsheet $book) => $book,
+            'writer' => fn(IWriter $writer) => $writer,
+        ];
+
         $typeMap = [
             'xlsx' => 'Xlsx',
             'xlsm' => 'Xlsx',
@@ -249,7 +267,11 @@ class Renderer
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $type = $typeMap[strtolower($extension)];
 
-        $book = IOFactory::createReader($type)->load($filename);
+        $reader = IOFactory::createReader($type);
+        $reader = $callbacks['reader']($reader) ?? $reader;
+
+        $book = $reader->load($filename);
+        $book = $callbacks['before']($book) ?? $book;
 
         foreach ($sheetsVars as $eitherNameOrIndex => $vars) {
             if ($eitherNameOrIndex === "") {
@@ -267,12 +289,13 @@ class Renderer
             }
         }
 
-        if ($done) {
-            $done($book);
-        }
+        $book = $callbacks['after']($book) ?? $book;
+
+        $writer = IOFactory::createWriter($book, $type);
+        $writer = $callbacks['writer']($writer) ?? $writer;
 
         $tmpfile = tempnam(sys_get_temp_dir(), 'excelate');
-        IOFactory::createWriter($book, $type)->save($tmpfile);
+        $writer->save($tmpfile);
         return $tmpfile;
     }
 

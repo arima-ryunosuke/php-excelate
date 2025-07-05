@@ -114,8 +114,9 @@ class Utils
             self::copyCells($sheet, $left, $bottom + 1, $right, $bottomLimit, null, $top, 'move');
         }
         else {
+            self::copyCells($sheet, $left, $bottom + 1, $right, $bottomLimit, null, $bottom + 1 + $size, 'move');
             for ($n = 0; $n < $length; $n++) {
-                self::copyCells($sheet, $left, $top, $right, $bottomLimit + $n * $height, null, $bottom + 1);
+                self::copyCells($sheet, $left, $top, $right, $bottom, null, $bottom + 1 + $n * $height);
             }
         }
 
@@ -152,8 +153,9 @@ class Utils
             self::copyCells($sheet, $right + 1, $top, $rightLimit, $bottom, $left, null, 'move');
         }
         else {
+            self::copyCells($sheet, $right + 1, $top, $rightLimit, $bottom, $right + 1 + $size, null, 'move');
             for ($n = 0; $n < $length; $n++) {
-                self::copyCells($sheet, $left, $top, $rightLimit + $n * $width, $bottom, $right + 1, null);
+                self::copyCells($sheet, $left, $top, $right, $bottom, $right + 1 + $n * $width, null);
             }
         }
 

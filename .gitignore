@@ -2,3 +2,5 @@
 /demo/template-out.xlsx
 /tests/phpunit.xml
 /tests/.phpunit.result.cache
+/tests/versions/*/composer.lock
+/tests/versions/*/vendor

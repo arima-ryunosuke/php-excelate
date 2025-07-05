@@ -36,7 +36,10 @@
       "@composer clean"
     ],
     "test": [
-      "vendor/bin/phpunit --configuration=tests/phpunit.xml"
+      "vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "PHPVERSION=php7.4 vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "PHPVERSION=php8.0 vendor/bin/phpunit --configuration=tests/phpunit.xml",
+      "PHPVERSION=php8.2 vendor/bin/phpunit --configuration=tests/phpunit.xml"
     ],
     "clean": [
       "@php bin/clean.php"

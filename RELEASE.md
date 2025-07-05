@@ -20,6 +20,15 @@
 
 - パースがメチャクチャなので構文を php に寄せて token_get_all あたりで楽したい
 
+## 1.1.1
+
+- [feature] col を追加＋簡易フォーマットの指定機能
+- [refactor] (row|col)shift が異常に遅かったので是正
+- [fixbug] (row|col)shift でデータが空の時にテンプレートが残る不具合
+- [fixbug] insertNew(Row|Column) の負数で消すと変なデータが残ることがある
+- [fixbug] (row|col)shift でテンプレート範囲が増減しない不具合
+- [fixbug] A1 に template タグを入れると他の構文が吹き飛ぶ不具合
+
 ## 1.1.0
 
 - [*change] 互換のために残していた render メソッドを削除

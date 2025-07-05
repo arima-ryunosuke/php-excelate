@@ -288,7 +288,6 @@ class Renderer
             $cell = $sheet->getCell('A1');
             $cellvalue = $cell->getValue();
             $tokens = $this->parse($cellvalue, $vars);
-            $cell->setValue($cellvalue);
             foreach ($tokens as $token) {
                 if (is_array($token)) {
                     switch ($token['type']) {
@@ -310,6 +309,7 @@ class Renderer
         [$left, $top] = $lt;
         [$right, $bottom] = $rb;
 
+        error_clear_last();
         return $this->_render($sheet, $vars, $left, $top, $right, $bottom);
     }
 
@@ -340,7 +340,10 @@ class Renderer
                 foreach ($tokens as $token) {
                     switch ($token['type']) {
                         case 'template':
-                            throw new \DomainException('{template} tag is permitted only A1 cell.');
+                            if (!($row === 1 && $col === 1)) {
+                                throw new \DomainException('{template} tag is permitted only A1 cell.');
+                            }
+                            break;
                         case 'row':
                             $varss = $this->placeholder($token['args']['values'], $vars);
                             foreach (array_values($varss) as $dc => $value) {

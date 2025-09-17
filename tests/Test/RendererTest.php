@@ -67,8 +67,8 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
             'st'    => 'hogera',
         ]);
         $this->assertEquals('aHOGERAz', $sheet->getTitle());
-        // A1 が問題なくレンダリングされているはず
-        $this->assertEquals('tValuevalue', $sheet->getCell('A1')->getValue());
+        // A1 範囲外のはずで template タグも残らないはず
+        $this->assertEquals('{$value}value', $sheet->getCell('A1')->getValue());
         // B2 は $value の値のはず
         $this->assertEquals('tValue', $sheet->getCell('B2')->getValue());
         // 範囲外はレンダリングされていないはず

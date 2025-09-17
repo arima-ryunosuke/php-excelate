@@ -310,7 +310,8 @@ class Renderer
         if ($range === null) {
             $cell = $sheet->getCell('A1');
             $cellvalue = $cell->getValue();
-            $tokens = $this->parse($cellvalue, $vars);
+            $nest = 1;
+            $tokens = $this->parse($cellvalue, $vars, $nest);
             foreach ($tokens as $token) {
                 if (is_array($token)) {
                     switch ($token['type']) {
@@ -318,6 +319,13 @@ class Renderer
                             $range = $token['args']['range'];
                             break;
                     }
+                }
+            }
+            // 範囲指定に A1 が含まれていないなら{template} が残ってしまうので消さなければならない
+            if ($range !== null) {
+                [$lt] = Coordinate::rangeBoundaries($range);
+                if ($lt[0] > 1 || $lt[1] > 1) {
+                    $cell->setValue($cellvalue);
                 }
             }
         }

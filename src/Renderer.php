@@ -26,6 +26,9 @@ class Renderer
     const ERROR_MODE_WARNING   = 3; // 通常の WARNING として発生させる
     const ERROR_MODE_EXCEPTION = 4; // 例外として送出する
 
+    /** @var array */
+    private $parsedCells;
+
     /** @var Cell */
     private $currentCell;
 
@@ -301,6 +304,7 @@ class Renderer
 
     public function renderSheet(Worksheet $sheet, $vars, $range = null)
     {
+        $this->parsedCells = [];
         $this->currentCell = $sheet->getCell('A1');
 
         $title = $sheet->getTitle();
@@ -341,7 +345,13 @@ class Renderer
         [$right, $bottom] = $rb;
 
         error_clear_last();
-        return $this->_render($sheet, $vars, $left, $top, $right, $bottom);
+        // 1パス目（セルの増減が発生する可能性がある）
+        $result = $this->_render($sheet, $vars, $left, $top, $right, $bottom);
+        // 2パス目（行の増減は↑で担保されているが rowshift などの歪な矩形でレンダリング漏れが発生する可能性はある）
+        // 2回レンダリングするのは本質的に危険ではあるが parsedCells で記録しているので大丈夫
+        // 将来的にビルド（セルの増減を伴う）とレンダリング（値の埋め込みのみ）の2フェーズに分けることを画策してるのでその布石となる
+        $this->_render($sheet, $vars, $left, $top, $right + $result[0], $bottom + $result[1]);
+        return $result;
     }
 
     private function _render(Worksheet $sheet, $vars, $left, $top, $right, $bottom)
@@ -360,6 +370,9 @@ class Renderer
 
         for ($row = $top; $row <= $bottom; $row++) {
             for ($col = $left; $col <= $right; $col++) {
+                if (isset($this->parsedCells[$row][$col])) {
+                    continue;
+                }
                 $cell = $sheet->getCell([$col, $row]);
                 $cellvalue = $cellvalue2 = $cell->getValue();
                 $this->currentCell = $cell;
@@ -536,6 +549,9 @@ class Renderer
                             }
                             break;
                     }
+                }
+                if ($nest === 0) {
+                    $this->parsedCells[$row][$col] = true;
                 }
             }
         }

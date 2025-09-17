@@ -231,6 +231,9 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $renderer = new Renderer();
         $sheet = self::$testBook->getSheetByName('roweach');
         $delta = $renderer->renderSheet($sheet, [
+            'hoge'    => '{"HOGE"}',
+            'fuga'    => '{"FUGA"}',
+            'piyo'    => '{"PIYO"}',
             'dummys1' => [
                 ['hoge' => 'HOGE1', 'fuga' => 'FUGA1', 'piyo' => 'PIYO1'],
                 ['hoge' => 'HOGE2', 'fuga' => 'FUGA2', 'piyo' => 'PIYO2'],
@@ -269,6 +272,19 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         $this->assertEquals(12, $delta[1]);
 
         $this->assertRangeValues(<<<EXPECTED
+        {"HOGE"}
+        {"FUGA"}
+        
+        
+        
+        
+        
+        
+        
+        {"PIYO"}
+        EXPECTED, $sheet, 'I13:I22');
+
+        $this->assertRangeValues(<<<EXPECTED
         0first | | HOGE1 | FUGA1 | PIYO1 | |
         1      | | HOGE2 | FUGA2 | PIYO2 | |
         2last  | | HOGE3 | FUGA3 | PIYO3 | |
@@ -296,10 +312,10 @@ class RendererTest extends \ryunosuke\Test\Excelate\AbstractTestCase
         EXPECTED, $sheet, 'B13:H21');
 
         $this->assertRangeValues(<<<EXPECTED
-        |        |  |  |  |  |  |  |
-        | top    |  |  |  |  |  |  |
-        | bottom |  |  |  |  |  |  |
-        |        |  |  |  |  |  |  |
+        |          |  |  |  |  |  |  |
+        | {"HOGE"} |  |  |  |  |  |  |
+        | {"PIYO"} |  |  |  |  |  |  |
+        |          |  |  |  |  |  |  |
         EXPECTED, $sheet, 'A23:I26');
     }
 
